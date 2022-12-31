@@ -14,11 +14,13 @@
 pip install -r requirements.txt
 ```
 
-Then, run the flask app by
+Then, run the app by
 
 ```
-flask run
+python3 app.py
 ```
+
+We have added `eventlet` as a server for this app. So, we don't need to run `flask run` to use `flask`s default development server, as it is not intented to use in production ready app.
 
 # Docker
 

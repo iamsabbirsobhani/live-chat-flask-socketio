@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/dist/output.css">
+    <title>Live Chat App</title>
+
+    <style>
+        body {
+            background-color: hsl(0, 0%, 14%);
+        }
+
+        .bg-glow {
+            display: flex;
+            position: relative;
+            height: 60px;
+            width: 150px;
+            left: -50%;
+            top: -50px;
+            background-image: linear-gradient(-45deg, #34D399 50%, #22D3EE 50%);
+            filter: blur(72px);
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="w-[310px] m-auto">
+        <div class=" relative mt-2">
+            <div class=" w-16 m-auto">
+                <img src="/chat.png" alt="chat logo">
+            </div>
+            <div style="position: absolute; left: 50%;">
+                <div class="bg-glow"></div>
+            </div>
+        </div>
+
+        <!-- chat -->
+        <div class=" h-[70vh] overflow-y-scroll mt-5" id="chats">
+            <div class=" grid grid-cols-1 gap-4" id="chat">
+            </div>
+        </div>
+
+        <!-- typing -->
+        <div class=" mt-4">
+            <form action="" id="sendMsg" method="post" class=" flex justify-around">
+                <input type="text" name="" id="" placeholder="type..." class=" border-2 rounded-md px-2">
+                <div>
+                    <button
+                        class=" bg-gradient-to-r from-cyan-500  to-blue-500 rounded-md p-2 w-16 font-bold uppercase text-white hover:from-cyan-600 hover:to-blue-600 hover:text-gray-100">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous">
+        </script>
+
+    <script>
+        const chatBox = document.getElementById('chat');
+        const sendMsg = document.getElementById('sendMsg');
+        const chatScrl = document.getElementById('chats');
+
+        function renderChat(chats, id) {
+            // without this line, it will render all chats again and again
+
+            chatBox.innerHTML = '';
+
+            chats.forEach(chat => {
+                if (chat.uid === id) {
+                    chatBox.innerHTML += `
+                <div
+                    class=" col-span-1 w-[200px] mr-1 box-border bg-cyan-600 ml-auto rounded-md p-2 text-white font-semibold bg-gradient-to-r from-cyan-500 to-blue-500 backdrop-blur-lg">
+                    <h1>${chat.msg}</h1>
+                    <p class=" mt-2 text-right text-xs" id="timeSelf">${new Date(chat.id).toLocaleTimeString()}</p>
+                </div>
+               `
+                } else {
+                    chatBox.innerHTML += `<div
+                    class=" col-span-1 grid-rows-1 w-[200px] text-left bg-gray-800 text-white rounded-md p-2 font-semibold">
+                    <h1>${chat.msg}</h1>
+                    <p class=" mt-2 text-right text-xs" id="timeOther">${new Date(chat.id).toLocaleTimeString()}</p>
+                </div>`
+                }
+            })
+        }
+
+        // socket client
+        const socket = io('https://live-chat-flask-socketio.azurewebsites.net');
+        // const socket = io("http://localhost:8080/");
+
+        sendMsg.addEventListener('submit', event => {
+            event.preventDefault();
+
+            console.log(event.target[0].value);
+
+            // if input is empty, return
+            if (event.target[0].value === '') {
+                return;
+            }
+
+            socket.emit("sendMsg", event.target[0].value);
+
+            // empty input
+            event.target[0].value = '';
+        })
+
+        socket.on("recvMsg", (chats) => {
+            console.log(chats);
+            renderChat(chats, socket.id);
+
+            // scroll to bottom
+            chatScrl.scrollTop = chatScrl.scrollHeight;
+        })
+    </script>
+</body>
+
+</html>

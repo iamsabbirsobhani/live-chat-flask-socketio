@@ -2,7 +2,13 @@
 
 ## Using Flask, Python-Socketio
 
-Clone the repo and intall necessary dependencies
+1. Clone the repo
+
+2. Create a virtualenv
+
+3. Active the virtualenv
+
+4. Install necessary dependencies
 
 ```
 pip install -r requirements.txt
@@ -26,8 +32,16 @@ docker push sabbirsobhani/live-chat-flask-socketio
 
 # Commands Dockerfile
 
+with gunicorn
+
 ```
 CMD [ "gunicorn", "--worker-class", "eventlet", "-w", "1", "app:app"]
+```
+
+with only/direct eventlet
+
+```
+CMD [ "python3", "app.py"]
 ```
 
 # Thanks
